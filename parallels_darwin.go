@@ -111,7 +111,7 @@ func (d *Driver) Create() error {
 
 	absStorePath, _ := filepath.Abs(d.ResolveStorePath("."))
 	if err = prlctl("create", d.MachineName,
-		"--distribution", "boot2docker",
+		"--distribution", "linux",
 		"--dst", absStorePath,
 		"--no-hdd"); err != nil {
 		return err
@@ -210,6 +210,13 @@ func (d *Driver) Create() error {
 		"--shared-cloud", "off",
 		"--shared-profile", "off",
 		"--smart-mount", "off"); err != nil {
+		return err
+	}
+
+	// Configure Serial Console as a socket
+	if err = prlctl("set", d.MachineName,
+		"--device-add", "serial",
+		"--socket", fmt.Sprintf("parallels-serial-%s", d.MachineName)); err != nil {
 		return err
 	}
 
